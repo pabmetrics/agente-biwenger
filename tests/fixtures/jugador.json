@@ -1,0 +1,466 @@
+{
+ "status": 200,
+ "data": {
+  "id": 11,
+  "name": "David Soria",
+  "slug": "david-soria",
+  "position": 1,
+  "price": 5690000,
+  "fantasyPrice": 48000000,
+  "country": "ES",
+  "number": 13,
+  "birthday": 19930404,
+  "status": "ok",
+  "priceIncrement": -50000,
+  "competition": {
+   "id": 1,
+   "name": "Primera División",
+   "slug": "la-liga",
+   "sport": "football",
+   "currency": "€"
+  },
+  "team": {
+   "id": 8,
+   "name": "Getafe",
+   "slug": "getafe",
+   "nextGames": [
+    {
+     "id": 50793,
+     "date": 1792436400,
+     "status": "pending",
+     "home": {
+      "id": 8,
+      "name": "Getafe",
+      "slug": "getafe",
+      "score": null,
+      "difficulty": {
+       "rating": 39,
+       "standings": [
+        43,
+        35
+       ],
+       "homeAway": [
+        24,
+        20
+       ],
+       "form": [
+        53,
+        25
+       ],
+       "goalDiff": [
+        29,
+        20
+       ]
+      }
+     },
+     "away": {
+      "id": 70,
+      "name": "Rayo Vallecano",
+      "slug": "rayo-vallecano",
+      "score": null,
+      "difficulty": {
+       "rating": 31,
+       "standings": [
+        38,
+        35
+       ],
+       "homeAway": [
+        17,
+        20
+       ],
+       "form": [
+        38,
+        25
+       ],
+       "goalDiff": [
+        25,
+        20
+       ]
+      }
+     },
+     "round": {
+      "id": 4907,
+      "name": "Jornada 9",
+      "short": "J9"
+     },
+     "competition": {
+      "id": 1,
+      "name": "Primera División",
+      "slug": "la-liga",
+      "sport": "football",
+      "currency": "€"
+     },
+     "preview": null,
+     "summary": null
+    }
+   ]
+  },
+  "prices": [
+   [
+    261010,
+    5830000
+   ],
+   [
+    261011,
+    5810000
+   ],
+   [
+    261012,
+    5770000
+   ],
+   [
+    261013,
+    5740000
+   ],
+   [
+    261014,
+    5690000
+   ]
+  ],
+  "news": [],
+  "threads": [],
+  "playedHome": 4,
+  "playedAway": 4,
+  "reports": [
+   {
+    "home": false,
+    "match": {
+     "id": 50782,
+     "date": 1791649800,
+     "status": "finished",
+     "home": {
+      "id": 3,
+      "name": "Barcelona",
+      "slug": "barcelona",
+      "score": 3
+     },
+     "away": {
+      "id": 8,
+      "name": "Getafe",
+      "slug": "getafe",
+      "score": 0
+     },
+     "round": {
+      "id": 4906,
+      "name": "Jornada 8",
+      "short": "J8"
+     },
+     "preview": null,
+     "summary": null
+    },
+    "points": {
+     "1": 2,
+     "2": -1,
+     "3": 2,
+     "5": 1,
+     "6": 2,
+     "7": 5,
+     "8": 4
+    }
+   }
+  ],
+  "seasons": [
+   {
+    "id": "2027",
+    "name": "Temporada 2026/2027",
+    "slug": "2026-2027",
+    "names": {
+     "es": "Temporada 2026/2027",
+     "ca": "Temporada 2026/2027",
+     "eu": "2026/2027 Denboraldia",
+     "gl": "Tempada 2026/2027",
+     "es-419": "Temporada 2026/2027"
+    },
+    "games": 8,
+    "points": {
+     "1": 48,
+     "2": 47,
+     "3": 28,
+     "5": 50,
+     "6": 40,
+     "7": 45,
+     "8": 48
+    },
+    "selected": true
+   },
+   {
+    "id": "2026",
+    "name": "Temporada 2025/2026",
+    "slug": "2025-2026",
+    "names": {
+     "es": "Temporada 2025/2026",
+     "ca": "Temporada 2025/2026",
+     "eu": "2025/2026 Denboraldia",
+     "gl": "Tempada 2025/2026",
+     "es-419": "Temporada 2025/2026"
+    },
+    "games": 38,
+    "points": {
+     "1": 180,
+     "2": 199,
+     "3": 118,
+     "5": 196,
+     "6": 156,
+     "7": null,
+     "8": null
+    }
+   },
+   {
+    "id": "2025",
+    "name": "Temporada 2024/2025",
+    "slug": "2024-2025",
+    "names": {
+     "es": "Temporada 2024/2025",
+     "ca": "Temporada 2024/2025",
+     "eu": "2024/2025 Denboraldia",
+     "gl": "Tempada 2024/2025",
+     "es-419": "Temporada 2024/2025"
+    },
+    "games": 38,
+    "points": {
+     "1": 164,
+     "2": 181,
+     "3": 83,
+     "5": 183,
+     "6": 153,
+     "7": null,
+     "8": null
+    }
+   },
+   {
+    "id": "2024",
+    "name": "Temporada 2023/2024",
+    "slug": "2023-2024",
+    "names": {
+     "es": "Temporada 2023/2024",
+     "ca": "Temporada 2023/2024",
+     "eu": "2023/2024 Denboraldia",
+     "gl": "Tempada 2023/2024",
+     "es-419": "Temporada 2023/2024"
+    },
+    "games": 38,
+    "points": {
+     "1": 164,
+     "2": 198,
+     "3": 98,
+     "5": 189,
+     "6": 127,
+     "7": null,
+     "8": null
+    }
+   },
+   {
+    "id": "2023",
+    "name": "Temporada 2022/2023",
+    "slug": "2022-2023",
+    "names": {
+     "es": "Temporada 2022/2023",
+     "ca": "Temporada 2022/2023",
+     "eu": "2022/2023 Denboraldia",
+     "gl": "Tempada 2022/2023",
+     "es-419": "Temporada 2022/2023"
+    },
+    "games": 38,
+    "points": {
+     "1": 164,
+     "2": 175,
+     "3": 125,
+     "5": 178,
+     "6": 148,
+     "7": null,
+     "8": null
+    }
+   },
+   {
+    "id": "2022",
+    "name": "Temporada 2021/2022",
+    "slug": "2021-2022",
+    "names": {
+     "es": "Temporada 2021/2022",
+     "ca": "Temporada 2021/2022",
+     "eu": "2021/2022 Denboraldia",
+     "gl": "Tempada 2021/2022",
+     "es-419": "Temporada 2021/2022"
+    },
+    "games": 38,
+    "points": {
+     "1": 156,
+     "2": 157,
+     "3": 91,
+     "5": 165,
+     "6": 126,
+     "7": 232,
+     "8": null
+    }
+   },
+   {
+    "id": "2021",
+    "name": "Temporada 2020/2021",
+    "slug": "2020-2021",
+    "names": {
+     "es": "Temporada 2020/2021",
+     "ca": "Temporada 2020/2021",
+     "eu": "2020/2021 Denboraldia",
+     "gl": "Tempada 2020/2021",
+     "es-419": "Temporada 2020/2021"
+    },
+    "games": 28,
+    "points": {
+     "1": 92,
+     "2": 104,
+     "3": 56,
+     "5": 104,
+     "6": 76,
+     "7": 157,
+     "8": null
+    }
+   },
+   {
+    "id": "2020",
+    "name": "Temporada 2019/2020",
+    "slug": "2019-2020",
+    "names": {
+     "es": "Temporada 2019/2020",
+     "ca": "Temporada 2019/2020",
+     "eu": "2019/2020 Denboraldia",
+     "gl": "Tempada 2019/2020",
+     "es-419": "Temporada 2019/2020"
+    },
+    "games": 38,
+    "points": {
+     "1": 132,
+     "2": 138,
+     "3": 81,
+     "5": 144,
+     "6": 126,
+     "7": 13,
+     "8": null
+    }
+   },
+   {
+    "id": "2019",
+    "name": "Temporada 2018/2019",
+    "slug": "2018-2019",
+    "names": {
+     "es": "Temporada 2018/2019",
+     "ca": "Temporada 2018/2019",
+     "eu": "2018/2019 Denboraldia",
+     "gl": "Tempada 2018/2019",
+     "es-419": "Temporada 2018/2019"
+    },
+    "games": 37,
+    "points": {
+     "1": 168,
+     "2": 168,
+     "3": 110,
+     "5": 178,
+     "6": 43,
+     "7": null,
+     "8": null
+    }
+   },
+   {
+    "id": "2018",
+    "name": "Temporada 2017/2018",
+    "slug": "2017-2018",
+    "names": {
+     "es": "Temporada 2017/2018",
+     "ca": "Temporada 2017/2018",
+     "eu": "2017/2018 Denboraldia",
+     "gl": "Tempada 2017/2018",
+     "es-419": "Temporada 2017/2018"
+    },
+    "games": 15,
+    "points": {
+     "1": 50,
+     "2": 60,
+     "3": 40,
+     "5": 58,
+     "6": null,
+     "7": null,
+     "8": null
+    }
+   },
+   {
+    "id": "2017",
+    "name": "Temporada 2016/2017",
+    "slug": "2016-2017",
+    "names": {
+     "es": "Temporada 2016/2017",
+     "ca": "Temporada 2016/2017",
+     "eu": "2016/2017 Denboraldia",
+     "gl": "Tempada 2016/2017",
+     "es-419": "Temporada 2016/2017"
+    },
+    "games": 1,
+    "points": {
+     "1": 6,
+     "2": 5,
+     "3": 8,
+     "5": 6,
+     "6": null,
+     "7": null,
+     "8": null
+    }
+   },
+   {
+    "id": "2024",
+    "name": "2024",
+    "slug": "2024",
+    "names": {
+     "es": "2024",
+     "ca": "2024",
+     "eu": "2024",
+     "gl": "2024",
+     "es-419": "2024"
+    },
+    "games": 1,
+    "points": {
+     "1": -2,
+     "2": 2,
+     "5": 0
+    },
+    "competition": {
+     "id": 59,
+     "name": "Copa del Rey",
+     "slug": "copa-del-rey"
+    },
+    "player": {
+     "id": 32227,
+     "slug": "david-soria"
+    }
+   },
+   {
+    "id": "2018",
+    "name": "2017/2018",
+    "slug": "2017-2018",
+    "names": {
+     "es": "2017/2018",
+     "ca": "2017/2018",
+     "eu": "2017/2018",
+     "gl": "2017/2018",
+     "es-419": "2017/2018"
+    },
+    "games": 2,
+    "points": {
+     "1": 16,
+     "2": 15,
+     "3": 16,
+     "5": null,
+     "7": null,
+     "8": null
+    },
+    "competition": {
+     "id": 51,
+     "name": "Champions League",
+     "slug": "champions-league"
+    },
+    "player": {
+     "id": 4254,
+     "slug": "soria"
+    }
+   }
+  ],
+  "canonicalURL": "https://biwenger.as.com/blog/jugadores/david-soria/"
+ }
+}

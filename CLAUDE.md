@@ -13,6 +13,13 @@ El diseño completo está en @docs/diseno-agente-biwenger.md. Léelo antes de to
   - `azure_function/` — webhook de Telegram y ejecución de acciones en Biwenger.
   - `tests/`, `docs/`.
 
+## Comandos
+
+- Entorno: `.venv` con Python 3.12 (el más cercano al runtime de Databricks). `python` no está en el PATH de este portátil: usa `.venv\Scripts\python`.
+- Tests: `.venv\Scripts\python -m pytest`
+- Ingesta: `.venv\Scripts\python -m ingest.ingesta_diaria` · backfill: `-m ingest.backfill_jugadores`
+- Diccionario de la API: @docs/api-biwenger.md. Actualízalo cada vez que verifiques un endpoint o campo nuevo.
+
 ## Reglas duras
 
 - **El agente nunca tiene herramientas de escritura sobre Biwenger.** Solo lectura y `proponer_accion`. Pujar, vender, aceptar ofertas y alinear lo ejecuta únicamente la Azure Function tras un "Sí" en Telegram, antes del cierre del mercado.
