@@ -4,11 +4,15 @@ El detalle público trae ~1 año de precios diarios y los puntos de cada partido
 en todas las puntuaciones. Con esto el histórico de valor existe desde el
 primer día y el modelo de revalorización no tiene que esperar semanas.
 
-Se lanza una vez y después, como mucho, semanalmente: la variación diaria ya
-llega en la foto de `competicion`. ~550 llamadas a 1/s, unos 10 minutos.
+Límite real de Biwenger (14/10/2026): tras ~200 llamadas seguidas responde 429
+y pide esperar "unas horas". Por eso el backfill va por tandas:
+- se salta los jugadores que ya están en bronze (es reanudable);
+- hace como mucho --max jugadores por ejecución, con 3 s entre llamadas;
+- se para en el primer 429 en vez de seguir insistiendo.
+Con los valores por defecto, 550 jugadores se completan en 4 tandas.
 
 Uso:
-    python -m ingest.backfill_jugadores [--limite N]
+    python -m ingest.backfill_jugadores [--max 150] [--pausa 3] [--todos]
 """
 
 from __future__ import annotations
@@ -19,31 +23,45 @@ import sys
 from dotenv import load_dotenv
 
 from ingest import bronze
-from ingest.biwenger_api import BiwengerAPI, BiwengerError
+from ingest.biwenger_api import BiwengerAPI, BiwengerError, LimiteSuperado
+
+
+def ids_en_bronze() -> set[str]:
+    """Ids de jugador con al menos un detalle guardado (clave del fichero)."""
+    carpeta = bronze.ruta_base() / "raw_jugador"
+    return {f.stem.split("_", 1)[1].split("-")[0] for f in carpeta.glob("dt=*/*_*.json")}
 
 
 def main(argv: list[str] | None = None) -> int:
     load_dotenv()
     p = argparse.ArgumentParser()
-    p.add_argument("--limite", type=int, help="solo los N primeros jugadores (pruebas)")
+    p.add_argument("--max", type=int, default=150, help="jugadores por ejecución")
+    p.add_argument("--pausa", type=float, default=3.0, help="segundos entre llamadas")
+    p.add_argument("--todos", action="store_true", help="refrescar también los ya guardados")
     args = p.parse_args(argv)
 
-    api = BiwengerAPI()
+    api = BiwengerAPI(pausa_s=args.pausa)
     jugadores = list(api.competicion()["data"]["players"].values())
-    if args.limite:
-        jugadores = jugadores[: args.limite]
+    hechos = set() if args.todos else ids_en_bronze()
+    pendientes = [j for j in jugadores if str(j["id"]) not in hechos]
+    tanda = pendientes[: args.max]
+    print(f"{len(jugadores)} jugadores · {len(hechos)} ya en bronze · esta tanda: {len(tanda)}")
 
-    fallos = 0
-    for i, j in enumerate(jugadores, 1):
+    ok = fallos = 0
+    for j in tanda:
         try:
             cuerpo = api.jugador(j["slug"])
             bronze.guardar("jugador", cuerpo, api.ultima_url, api.ultimos_params, clave=str(j["id"]))
+            ok += 1
+        except LimiteSuperado as e:
+            print(f"[PARADA] {e}. Vuelve a lanzarlo en unas horas: retoma donde lo dejó.")
+            fallos += 1
+            break
         except (BiwengerError, bronze.EsquemaCambiado) as e:
             fallos += 1
             print(f"[ERROR] {j['slug']}: {e}")
-        if i % 50 == 0:
-            print(f"{i}/{len(jugadores)}")
-    print(f"Hecho: {len(jugadores) - fallos}/{len(jugadores)} jugadores")
+    quedan = len(pendientes) - ok
+    print(f"Guardados: {ok} · fallos: {fallos} · quedan: {quedan}")
     return 1 if fallos else 0
 
 

@@ -31,6 +31,10 @@ class BiwengerError(RuntimeError):
     pass
 
 
+class LimiteSuperado(BiwengerError):
+    """429: Biwenger pide esperar "unas horas". Hay que parar, no reintentar."""
+
+
 class BiwengerAPI:
     def __init__(
         self,
@@ -71,6 +75,8 @@ class BiwengerAPI:
             if r.status_code >= 500 and intento < REINTENTOS:
                 time.sleep(2**intento)
                 continue
+            if r.status_code == 429:
+                raise LimiteSuperado(f"429 en {url}: límite de peticiones superado")
             if r.status_code == 401:
                 raise BiwengerError(f"401 en {url}: token ausente o caducado")
             if r.status_code != 200:

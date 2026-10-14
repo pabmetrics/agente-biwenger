@@ -80,5 +80,6 @@ Escritura (Fase 5, solo desde la Azure Function, nunca desde el agente): pujar, 
 ## Ritmo y volumen
 
 - Ingesta diaria: 3 llamadas públicas + 4 privadas.
-- Backfill de jugadores: ~550 llamadas a 1/s (~10 min). Una vez, y después como mucho semanal: la variación diaria ya llega en `competicion`.
-- El cliente espera 1 s entre llamadas y reintenta los 5xx y los errores de red con espera exponencial.
+- **Límite de peticiones (comprobado el 14/10/2026):** tras ~200 llamadas seguidas a 1/s, `cf.biwenger.com` responde `429 Too Many Requests` ("vuelva a intentarlo en unas horas"). El cliente lanza `LimiteSuperado` y no reintenta.
+- Backfill de jugadores: ~550 llamadas, en tandas de 150 con 3 s entre llamadas. Es reanudable (se salta los jugadores ya guardados en bronze) y se para en el primer 429. Se hace una vez; después, como mucho, se refresca por tandas semanales: la variación diaria ya llega en `competicion`.
+- El cliente espera 1 s entre llamadas (3 s en el backfill) y reintenta los 5xx y los errores de red con espera exponencial.
