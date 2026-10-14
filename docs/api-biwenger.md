@@ -48,6 +48,20 @@ Parámetros comunes: `lang=es` y `score=5`. Basta con la cabecera `User-Agent`.
 | `prices` | `[[AAMMDD, precio], ...]`, ~366 días. Ej.: `[261014, 5690000]` = 14/10/2026 |
 | `reports[]` | Un elemento por partido: `match` (rival, marcador, jornada, fecha), `home` (bool) y `points`: un objeto con una entrada por puntuación, cuya clave es su id: `{"1": AS, "2": SofaScore, "3": Estadísticas, "5": Media AS+SofaScore, "6": Social, "7": Feeberse, "8": Media AS+Feeberse}` |
 | `seasons[]` | Partidos y puntos por temporada, por puntuación |
+
+En `reports[]`, un partido **sin `points` es un partido que no jugó**. No traen eventos, porque `jugador()` pide `events.type(0)`, así que los minutos salen de las jornadas.
+
+### Partidos de una jornada (`jornadas()` / `jornada(id)`)
+
+En una jornada terminada, `games[].home/away.reports[]` trae solo a los que jugaron: `player`, `points` (de la puntuación pedida, la 5), `events[]`, `star`, `mvp`, etc. Cada evento es `{type, period, metadata}`, donde `metadata` es el minuto.
+
+| `type` | Significado | Cómo se sabe |
+| --- | --- | --- |
+| 4 | Sale (sustituido) | Mismo número que los tipo 5 en la jornada 8 (86) |
+| **5** | **Entra (suplente)** | En cada equipo, los jugadores sin tipo 5 son exactamente 11 |
+| 1, 6, … | Sin confirmar (6 parece amarilla; 1, gol) | Pendiente; los minutos no los usan |
+
+Con 4 y 5, silver calcula `titular` y unos `minutos` aproximados: no cuentan el descuento ni las expulsiones. En `preview`, `reports[]` es el once probable: `{player, points: null}`, 11 por equipo.
 | `birthday`, `country`, `team` | Datos del jugador |
 
 ### Puntuaciones (`competicion.data.scores`)
@@ -82,7 +96,7 @@ El token es un JWT HS256 de 125 caracteres (`cabecera.datos.firma`, con una firm
 | Campo | Contenido |
 | --- | --- |
 | **`account`** | Mi cuenta: `id`, `name`, `email`, `phone`, `birthday`, `credits`, `locale`, `created`, `lastAccess`, `status`… **Datos personales: no pasan de bronze a silver** |
-| **`leagues[]`** | Una por liga: `id`, `name`, `competition`, `mode`, `marketMode`, `scoreID`, `type`, `settings`, `upgrades` y `user` (mi usuario en esa liga, de donde sale `X-User`) |
+| **`leagues[]`** | Una por liga: `id`, `name`, `competition`, `mode`, `marketMode`, `scoreID`, `type`, `upgrades`, `user` (mi usuario en esa liga, de donde sale `X-User`) y `settings` (reglas: cláusula, préstamos, alineación…). `settings.secret` es el código de invitación: no pasa a silver |
 | `location`, `notifications`, `version`, `lastOfficialLeagueChange` | No se usan |
 
 ### `plantilla()` → `data`
@@ -91,8 +105,8 @@ El token es un JWT HS256 de 125 caracteres (`cabecera.datos.firma`, con una firm
 | --- | --- |
 | **`id`**, `name`, `icon`, `role`, `joinDate`, `lastAccess`, `points` | Mi usuario en la liga |
 | **`balance`** | Saldo → `mi_saldo` |
-| **`players[]`** | `{id, owner}`: mis jugadores (el detalle de propiedad, como la cláusula, va en `owner`) |
-| **`lineup`** | `{type, playersID, date}`: formación y once actual |
+| **`players[]`** | `{id, owner: {date, price}}`: mis jugadores con fecha y precio de compra. **No trae la cláusula**: la liga tiene `settings.clause = "salePrice"`, así que probablemente se derive del valor de mercado (pendiente de confirmar) |
+| **`lineup`** | `{type, playersID, date}`: formación y once actual. Un hueco sin jugador viene como `null` en `playersID` |
 | `market` | Lista: mis jugadores puestos en venta |
 
 ### `mercado()` → `data`

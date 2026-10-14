@@ -46,11 +46,12 @@ Una ingesta diaria vuelca el JSON crudo a bronze; silver lo normaliza en tablas 
 | Bronze | `raw_<endpoint>` | Llamada a la API | JSON crudo + fecha de carga |
 | Silver | `dim_jugador` | Jugador | Equipo, posición, estado (lesionado, dudoso, sancionado) |
 | Silver | `fact_valor_diario` | Jugador × día | Valor de mercado y variación diaria |
-| Silver | `fact_puntos_jornada` | Jugador × jornada | Puntos Media, minutos, titularidad |
+| Silver | `fact_puntos_jornada` | Jugador × partido | Puntos Media, jugó sí/no, titularidad y minutos aproximados. Por partido y no por jornada porque hay jornadas aplazadas |
+| Silver | `fact_once_probable` | Día × partido × jugador | Onces probables de los partidos sin jugar, tal como estaban cada día |
 | Silver | `fact_mercado_dia` | Jugador en venta × día | Precio de salida, vendedor (liga o mánager) |
-| Silver | `mi_plantilla` | Jugador propio × día | Precio de compra, cláusula, alineado sí/no |
-| Silver | `mi_saldo` | Día | Saldo disponible |
-| Silver | `fact_ofertas` | Oferta | Jugador, importe, fecha límite |
+| Silver | `mi_plantilla` | Jugador propio × día | Precio y fecha de compra, alineado sí/no. La cláusula queda pendiente: no viene en la API |
+| Silver | `mi_saldo` | Día | Saldo, puja máxima, valor de equipo y posición en la liga |
+| Silver | `fact_ofertas` | Oferta | Jugador, importe, fecha límite. Pendiente hasta ver una oferta real en bronze |
 | Silver | `dim_calendario` | Partido | Jornada, rival, local/visitante, fecha |
 | Gold | `features_jugador` | Jugador × día | Tendencia de valor 3/7 días, forma, minutos, dificultad del rival |
 | Gold | `score_revalorizacion` | Jugador × día | Subida esperada a 1 y 3 días (%) |
