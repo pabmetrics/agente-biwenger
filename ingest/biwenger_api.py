@@ -132,7 +132,7 @@ class BiwengerAPI:
             },
         )
 
-    # --- privados (requieren token; rutas pendientes de verificar) ---------
+    # --- privados (requieren token; verificados el 14/10/2026) -------------
 
     def cuenta(self) -> dict:
         """Usuario y ligas; de aquí salen BIWENGER_LEAGUE_ID y BIWENGER_USER_ID."""

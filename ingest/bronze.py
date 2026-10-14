@@ -22,11 +22,11 @@ ESQUEMA_MINIMO: dict[str, set[str]] = {
     "jornadas": {"id", "status", "games"},
     "jornada": {"id", "status", "games"},
     "jugador": {"id", "slug", "prices", "reports"},
-    # Privados: sin esquema hasta verlos con el token (docs/api-biwenger.md).
-    "cuenta": set(),
-    "plantilla": set(),
-    "mercado": set(),
-    "liga": set(),
+    # Privados: verificados con token el 14/10/2026 (docs/api-biwenger.md).
+    "cuenta": {"account", "leagues"},
+    "plantilla": {"id", "balance", "players", "lineup"},
+    "mercado": {"sales", "offers", "status"},
+    "liga": {"id", "standings"},
 }
 
 CLAVES_JUGADOR = {"id", "name", "teamID", "position", "price", "priceIncrement", "status", "fitness"}

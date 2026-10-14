@@ -21,7 +21,7 @@ Bronze se escribe en `data/bronze/` (ignorado por git) o en `BRONZE_PATH`. Endpo
 
 ## Estado
 
-- [ ] Fase 1: ingesta — cliente, bronze y endpoints públicos hechos; faltan verificar los privados con token y el job en Databricks
+- [ ] Fase 1: ingesta — cliente, bronze y endpoints públicos y privados verificados; falta el job en Databricks
 - [ ] Fase 2: silver
 - [ ] Fase 3: gold con reglas
 - [ ] Fase 4: agente de solo lectura

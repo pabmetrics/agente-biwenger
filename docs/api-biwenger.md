@@ -66,7 +66,7 @@ Parámetros comunes: `lang=es` y `score=5`. Basta con la cabecera `User-Agent`.
 
 Sin token devuelven `401 Authorization required` (comprobado). Cabeceras: `Authorization: Bearer <token>`, `X-League: <id liga>`, `X-User: <id usuario en la liga>`, `X-Lang: es`.
 
-**Rutas y campos pendientes de verificar con el token.** Las rutas salen del uso habitual de la web. Hasta verlas, `bronze.ESQUEMA_MINIMO` no exige ninguna clave para ellas.
+**Rutas verificadas con token el 14/10/2026:** las cuatro responden 200. Las claves en negrita son las que exige `bronze.ESQUEMA_MINIMO`.
 
 | Método | Ruta | Bronze | Para qué |
 | --- | --- | --- | --- |
@@ -74,6 +74,41 @@ Sin token devuelven `401 Authorization required` (comprobado). Cabeceras: `Autho
 | `plantilla()` | `GET /user?fields=*,lineup(type,playersID),players(id,owner),market` | `raw_plantilla` | `mi_plantilla`, `mi_saldo`, alineación actual, cláusulas |
 | `mercado()` | `GET /market` | `raw_mercado` | `fact_mercado_dia` (jugadores en venta) y `fact_ofertas` (ofertas recibidas) |
 | `liga()` | `GET /league?include=all&fields=*,standings` | `raw_liga` | Clasificación y mánagers |
+
+El token es un JWT HS256 de 125 caracteres (`cabecera.datos.firma`, con una firma de 43). Solo trae `iss` e `iat`, **sin `exp`**: no caduca por fecha, sino cuando Biwenger cierra la sesión. La firma puede contener `-` y `_`, así que hay que copiarlo entero.
+
+### `cuenta()` → `data`
+
+| Campo | Contenido |
+| --- | --- |
+| **`account`** | Mi cuenta: `id`, `name`, `email`, `phone`, `birthday`, `credits`, `locale`, `created`, `lastAccess`, `status`… **Datos personales: no pasan de bronze a silver** |
+| **`leagues[]`** | Una por liga: `id`, `name`, `competition`, `mode`, `marketMode`, `scoreID`, `type`, `settings`, `upgrades` y `user` (mi usuario en esa liga, de donde sale `X-User`) |
+| `location`, `notifications`, `version`, `lastOfficialLeagueChange` | No se usan |
+
+### `plantilla()` → `data`
+
+| Campo | Contenido |
+| --- | --- |
+| **`id`**, `name`, `icon`, `role`, `joinDate`, `lastAccess`, `points` | Mi usuario en la liga |
+| **`balance`** | Saldo → `mi_saldo` |
+| **`players[]`** | `{id, owner}`: mis jugadores (el detalle de propiedad, como la cláusula, va en `owner`) |
+| **`lineup`** | `{type, playersID, date}`: formación y once actual |
+| `market` | Lista: mis jugadores puestos en venta |
+
+### `mercado()` → `data`
+
+| Campo | Contenido |
+| --- | --- |
+| **`sales[]`** | En venta hoy: `player`, `price`, `user` (vendedor; vacío si es Biwenger), `date`, `until` (cierre) |
+| **`offers`** | Lista de ofertas recibidas. Falta ver la forma de un elemento: hay que mirarla en bronze el primer día que haya una oferta |
+| **`status`** | `{balance, maximumBid}`: saldo y puja máxima permitida |
+
+### `liga()` → `data`
+
+| Campo | Contenido |
+| --- | --- |
+| **`id`**, `name`, `mode`, `marketMode`, `scoreID`, `type`, `created`, `icon`, `cover` | La liga |
+| **`standings[]`** | Por mánager: `id`, `name`, `position`, `points`, `teamValue`, `teamValueInc`, `teamSize`, `lastPositions`, `lastTrophy`, `role`, `lastAccess` |
 
 Escritura (Fase 5, solo desde la Azure Function, nunca desde el agente): pujar, vender, aceptar oferta y alinear. Sin explorar: se documentarán al llegar a esa fase observando las peticiones que hace la web.
 
