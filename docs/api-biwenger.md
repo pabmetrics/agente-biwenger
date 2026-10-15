@@ -85,7 +85,7 @@ Sin token devuelven `401 Authorization required` (comprobado). Cabeceras: `Autho
 | Método | Ruta | Bronze | Para qué |
 | --- | --- | --- | --- |
 | `cuenta()` | `GET /account` | `raw_cuenta` | Mis ligas y mi id de usuario en cada una → `BIWENGER_LEAGUE_ID`, `BIWENGER_USER_ID` |
-| `plantilla()` | `GET /user?fields=*,lineup(type,playersID),players(id,owner),market` | `raw_plantilla` | `mi_plantilla`, `mi_saldo`, alineación actual, cláusulas |
+| `plantilla()` | `GET /user?fields=*,lineup(type,playersID),players(id,owner),market` | `raw_plantilla` | `mi_plantilla`, `mi_saldo`, alineación actual y mis jugadores a la venta |
 | `mercado()` | `GET /market` | `raw_mercado` | `fact_mercado_dia` (jugadores en venta) y `fact_ofertas` (ofertas recibidas) |
 | `liga()` | `GET /league?include=all&fields=*,standings` | `raw_liga` | Clasificación y mánagers |
 
@@ -96,8 +96,29 @@ El token es un JWT HS256 de 125 caracteres (`cabecera.datos.firma`, con una firm
 | Campo | Contenido |
 | --- | --- |
 | **`account`** | Mi cuenta: `id`, `name`, `email`, `phone`, `birthday`, `credits`, `locale`, `created`, `lastAccess`, `status`… **Datos personales: no pasan de bronze a silver** |
-| **`leagues[]`** | Una por liga: `id`, `name`, `competition`, `mode`, `marketMode`, `scoreID`, `type`, `upgrades`, `user` (mi usuario en esa liga, de donde sale `X-User`) y `settings` (reglas: cláusula, préstamos, alineación…). `settings.secret` es el código de invitación: no pasa a silver |
+| **`leagues[]`** | Una por liga: `id`, `name`, `competition`, `mode`, `marketMode`, `scoreID`, `type`, `upgrades`, `user` (mi usuario en esa liga, de donde sale `X-User`) y `settings` (reglas: venta, préstamos, alineación…). `settings.secret` es el código de invitación: no pasa a silver |
 | `location`, `notifications`, `version`, `lastOfficialLeagueChange` | No se usan |
+
+`account.credits` son los créditos (₵) de la cuenta, que hacen falta para las formaciones de pago.
+
+### Formaciones (vistas en la app el 15/10/2026, no salen en la API)
+
+| Coste | Formaciones |
+| --- | --- |
+| Gratis | 3-4-3, 3-5-2, 4-3-3, 4-4-2, 4-5-1, 5-3-2, 5-4-1 |
+| 1 crédito | 3-6-1, 3-3-4, 4-2-4, 4-6-0, 5-2-3, 3-2-5, 5-1-4 |
+
+Siempre 1 portero. La liga tiene `lineupMultiPos: false`, así que cada jugador solo cuenta en su posición.
+
+### Ventas (regla del juego, contada por el usuario el 15/10/2026)
+
+- **Biwenger hace una oferta automática todos los días a las 7:00** por cada jugador que tengo a la venta, de aproximadamente su valor de mercado ±5 %. Así que **siempre se puede vender**, y el dinero llega en cuanto acepto la oferta. Para cuadrar el saldo antes de una jornada basta con ponerlo a la venta el día anterior y aceptar la oferta de las 7:00.
+- **No hay cláusulas.** Los otros mánagers solo pueden comprar mis jugadores a la venta, de dos formas:
+  - pagando **el precio que he pedido**: la compra es automática, sin que yo confirme nada;
+  - con una **oferta más baja**, que puedo aceptar o no.
+
+  Así que el precio que pongo al vender importa: es lo mínimo que cobro si me lo compra un mánager. La oferta de Biwenger de las 7:00 va aparte, y es de ~valor ±5 % sea cual sea el precio pedido.
+- Esas ofertas deberían aparecer en `mercado().offers`. La primera que llegue servirá para ver su forma y construir `fact_ofertas`.
 
 ### `plantilla()` → `data`
 
@@ -105,9 +126,9 @@ El token es un JWT HS256 de 125 caracteres (`cabecera.datos.firma`, con una firm
 | --- | --- |
 | **`id`**, `name`, `icon`, `role`, `joinDate`, `lastAccess`, `points` | Mi usuario en la liga |
 | **`balance`** | Saldo → `mi_saldo` |
-| **`players[]`** | `{id, owner: {date, price}}`: mis jugadores con fecha y precio de compra. **No trae la cláusula**: la liga tiene `settings.clause = "salePrice"`, así que probablemente se derive del valor de mercado (pendiente de confirmar) |
+| **`players[]`** | `{id, owner: {date, price}}`: mis jugadores con fecha y precio de compra. **En esta liga no hay cláusulas**: un jugador solo se puede comprar si su dueño lo pone a la venta. `settings.clause = "salePrice"` debe de ser eso: el precio de compra es el de venta (confirmado por el usuario el 15/10/2026) |
+| `market[]` | Mis jugadores a la venta: `{playerID, price, date, until, type: "sale"}`. `price` es el precio que he pedido |
 | **`lineup`** | `{type, playersID, date}`: formación y once actual. Un hueco sin jugador viene como `null` en `playersID` |
-| `market` | Lista: mis jugadores puestos en venta |
 
 ### `mercado()` → `data`
 
@@ -129,6 +150,6 @@ Escritura (Fase 5, solo desde la Azure Function, nunca desde el agente): pujar, 
 ## Ritmo y volumen
 
 - Ingesta diaria: 3 llamadas públicas + 4 privadas.
-- **Límite de peticiones (comprobado el 14/10/2026):** tras ~200 llamadas seguidas a 1/s, `cf.biwenger.com` responde `429 Too Many Requests` ("vuelva a intentarlo en unas horas"). El cliente lanza `LimiteSuperado` y no reintenta.
+- **Límite de peticiones (comprobado el 14/10/2026):** tras ~200 llamadas seguidas a 1/s, `cf.biwenger.com` responde `429 Too Many Requests` ("vuelva a intentarlo en unas horas"). El cliente lanza `LimiteSuperado` y no reintenta. A las 23:30 de ese día, `/competitions/la-liga/data` ya respondía, pero `/rounds/...` seguía con 429: el bloqueo no es igual para todas las rutas, o se levanta por partes. A la mañana siguiente (~16 h después) respondían todas.
 - Backfill de jugadores: ~550 llamadas, en tandas de 150 con 3 s entre llamadas. Es reanudable (se salta los jugadores ya guardados en bronze) y se para en el primer 429. Se hace una vez; después, como mucho, se refresca por tandas semanales: la variación diaria ya llega en `competicion`.
 - El cliente espera 1 s entre llamadas (3 s en el backfill) y reintenta los 5xx y los errores de red con espera exponencial.

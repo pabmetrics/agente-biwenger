@@ -6,7 +6,7 @@
 
 El agente propone cada día fichajes y ventas orientados a revalorización, y la víspera de cada jornada la alineación; ejecuta en Biwenger solo lo que confirmo por Telegram.
 
-- **Dentro:** compras, ventas, aceptar ofertas o cláusulas, y alineación de la jornada.
+- **Dentro:** compras, ventas (con su precio de venta), aceptar ofertas y alineación de la jornada. En la liga no hay cláusulas.
 - **Fuera (de momento):** gestión de varias ligas, chat libre con el agente y cambios de formación por táctica del rival.
 - **Punto de partida:** no hay datos ingestados; el proyecto empieza por la ingesta.
 
@@ -49,7 +49,7 @@ Una ingesta diaria vuelca el JSON crudo a bronze; silver lo normaliza en tablas 
 | Silver | `fact_puntos_jornada` | Jugador × partido | Puntos Media, jugó sí/no, titularidad y minutos aproximados. Por partido y no por jornada porque hay jornadas aplazadas |
 | Silver | `fact_once_probable` | Día × partido × jugador | Onces probables de los partidos sin jugar, tal como estaban cada día |
 | Silver | `fact_mercado_dia` | Jugador en venta × día | Precio de salida, vendedor (liga o mánager) |
-| Silver | `mi_plantilla` | Jugador propio × día | Precio y fecha de compra, alineado sí/no. La cláusula queda pendiente: no viene en la API |
+| Silver | `mi_plantilla` | Jugador propio × día | Precio y fecha de compra, alineado sí/no. Sin cláusula: la liga no tiene |
 | Silver | `mi_saldo` | Día | Saldo, puja máxima, valor de equipo y posición en la liga |
 | Silver | `fact_ofertas` | Oferta | Jugador, importe, fecha límite. Pendiente hasta ver una oferta real en bronze |
 | Silver | `dim_calendario` | Partido | Jornada, rival, local/visitante, fecha |
@@ -66,7 +66,7 @@ Claude solo tiene herramientas de lectura y de propuesta; las acciones en Biweng
 
 | Herramienta | Tipo | Qué hace | Quién la ejecuta |
 | --- | --- | --- | --- |
-| `leer_plantilla_y_saldo` | Lectura | Plantilla, cláusulas y saldo actual | Claude (SQL a gold/silver) |
+| `leer_plantilla_y_saldo` | Lectura | Plantilla, jugadores a la venta y saldo actual | Claude (SQL a gold/silver) |
 | `leer_mercado_con_scores` | Lectura | Jugadores en venta con score de revalorización y puntos esperados | Claude |
 | `leer_ofertas_recibidas` | Lectura | Ofertas abiertas por mis jugadores | Claude |
 | `leer_jugador` | Lectura | Histórico de valor, puntos y próximos rivales de un jugador | Claude |
@@ -83,17 +83,17 @@ El modelo ML pone los números; Claude decide con ellos, el saldo y el contexto,
 1. Leer plantilla, saldo, ofertas y mercado con scores.
 2. Ordenar el mercado por subida esperada a 1–3 días, descartando lesionados y sancionados.
 3. Elegir compras: mayor subida esperada por euro invertido.
-4. Si el saldo queda negativo, añadir ventas hasta volver a cero antes del cierre de la jornada:
+4. Si el saldo queda negativo, añadir ventas hasta volver a cero antes del cierre de la jornada. Biwenger ofrece cada día a las 7:00 aproximadamente el valor de mercado (±5 %) por cada jugador en venta, así que la venta está garantizada si se pone a la venta la víspera; para tener margen, cuenta con el −5 %:
    1. Primero aceptar ofertas recibidas por encima del valor de mercado.
    2. Después vender jugadores con bajada esperada.
-   3. Nunca dejar la plantilla sin un once válido.
+   3. Nunca dejar la plantilla sin un once válido en alguna formación disponible: las gratuitas, o las de pago si hay créditos.
 5. Enviar un único paquete (compras + ventas) para confirmar.
 
 ### Alineación (víspera de jornada)
 
 1. Leer plantilla y puntos esperados de la jornada.
 2. Para cada jugador dudoso, `web_search` de noticias y alineaciones probables.
-3. Elegir el once con más puntos esperados que cumpla una formación válida.
+3. Elegir el once con más puntos esperados que cumpla una formación válida: las 7 gratuitas, o también las 7 de pago si hay créditos (lista en `docs/api-biwenger.md`).
 4. Enviar la alineación para confirmar, marcando las dudas.
 
 ### Pendiente de definir

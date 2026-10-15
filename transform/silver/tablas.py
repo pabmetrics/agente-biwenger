@@ -293,7 +293,7 @@ def ofertas_sin_mapear(mercado: list[Registro]) -> int:
 
 
 def mi_plantilla(plantilla: list[Registro]) -> list[dict]:
-    """Mis jugadores cada día. La cláusula no viene en /user (pendiente)."""
+    """Mis jugadores cada día (la liga no tiene cláusulas)."""
     filas = []
     for r in ultimo_por_dia(plantilla):
         alineados = set(r.data.get("lineup", {}).get("playersID") or [])
