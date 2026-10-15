@@ -8,7 +8,8 @@ Límite real de Biwenger (14/10/2026): tras ~200 llamadas seguidas responde 429
 y pide esperar "unas horas". Por eso el backfill va por tandas:
 - se salta los jugadores que ya están en bronze (es reanudable);
 - hace como mucho --max jugadores por ejecución, con 3 s entre llamadas;
-- se para en el primer 429 en vez de seguir insistiendo.
+- se para en el primer 429 en vez de seguir insistiendo;
+- empieza por mi plantilla y el mercado, que son los que se necesitan antes.
 Con los valores por defecto, 550 jugadores se completan en 4 tandas.
 
 Uso:
@@ -18,6 +19,7 @@ Uso:
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 
 from dotenv import load_dotenv
@@ -32,6 +34,20 @@ def ids_en_bronze() -> set[str]:
     return {f.stem.split("_", 1)[1].split("-")[0] for f in carpeta.glob("dt=*/*_*.json")}
 
 
+def ids_prioritarios() -> set[str]:
+    """Mi plantilla y el mercado de la última foto: sus históricos se necesitan antes."""
+    ids: set[str] = set()
+    for endpoint, extraer in (
+        ("plantilla", lambda d: [p["id"] for p in d.get("players", [])]),
+        ("mercado", lambda d: [s["player"]["id"] for s in d.get("sales", [])]),
+    ):
+        ficheros = sorted((bronze.ruta_base() / f"raw_{endpoint}").glob("dt=*/*.json"))
+        if ficheros:
+            data = json.loads(ficheros[-1].read_text(encoding="utf-8"))["payload"]["data"]
+            ids.update(str(i) for i in extraer(data))
+    return ids
+
+
 def main(argv: list[str] | None = None) -> int:
     load_dotenv()
     p = argparse.ArgumentParser()
@@ -44,6 +60,8 @@ def main(argv: list[str] | None = None) -> int:
     jugadores = list(api.competicion()["data"]["players"].values())
     hechos = set() if args.todos else ids_en_bronze()
     pendientes = [j for j in jugadores if str(j["id"]) not in hechos]
+    prioritarios = ids_prioritarios()
+    pendientes.sort(key=lambda j: str(j["id"]) not in prioritarios)  # estable: primero los míos
     tanda = pendientes[: args.max]
     print(f"{len(jugadores)} jugadores · {len(hechos)} ya en bronze · esta tanda: {len(tanda)}")
 

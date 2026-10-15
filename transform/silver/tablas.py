@@ -34,6 +34,7 @@ ESQUEMAS: dict[str, list[str]] = {
         "publicado_utc", "cierre_utc",
     ],
     "mi_plantilla": ["fecha", "jugador_id", "fecha_compra", "precio_compra", "alineado"],
+    "mis_ventas": ["fecha", "jugador_id", "precio_pedido", "publicado_utc", "cierre_utc"],
     "mi_saldo": ["fecha", "saldo", "puja_maxima", "valor_equipo", "puntos", "posicion_liga"],
 }
 
@@ -305,6 +306,26 @@ def mi_plantilla(plantilla: list[Registro]) -> list[dict]:
                 "fecha_compra": _fecha(owner.get("date")),
                 "precio_compra": owner.get("price"),
                 "alineado": p["id"] in alineados,
+            })
+    return filas
+
+
+def mis_ventas(plantilla: list[Registro]) -> list[dict]:
+    """Mis jugadores a la venta cada día y el precio que pido.
+
+    Un mánager que pague precio_pedido se lo lleva sin que yo confirme nada.
+    """
+    filas = []
+    for r in ultimo_por_dia(plantilla):
+        for v in r.data.get("market") or []:
+            if v.get("type", "sale") != "sale":
+                continue
+            filas.append({
+                "fecha": r.fecha,
+                "jugador_id": v["playerID"],
+                "precio_pedido": v.get("price"),
+                "publicado_utc": _ts(v.get("date")),
+                "cierre_utc": _ts(v.get("until")),
             })
     return filas
 

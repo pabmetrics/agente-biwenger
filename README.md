@@ -4,7 +4,7 @@ Agente que propone cada día fichajes y ventas orientados a revalorización y, l
 
 Stack: Databricks (ingesta, lakehouse Delta, scores) · API de Claude (agente con herramientas de solo lectura) · Bot de Telegram · Azure Function (ejecuta lo confirmado).
 
-Diseño completo: [docs/diseno-agente-biwenger.md](docs/diseno-agente-biwenger.md).
+Diseño completo: [docs/diseno-agente-biwenger.md](docs/diseno-agente-biwenger.md). Lo que hay que preparar a mano (bot, claves, Databricks): [docs/puesta-en-marcha.md](docs/puesta-en-marcha.md).
 
 ## Puesta en marcha (local)
 
@@ -14,7 +14,8 @@ py -3.12 -m venv .venv
 copy .env.example .env      # y rellena el token
 .venv\Scripts\python -m pytest
 .venv\Scripts\python -m ingest.ingesta_diaria          # foto diaria a bronze
-.venv\Scripts\python -m ingest.backfill_jugadores      # ~1 año de precios (una vez)
+.venv\Scripts\python -m ingest.backfill_jugadores      # ~1 año de precios (por tandas de 150)
+.venv\Scripts\python -m ingest.backfill_jornadas       # jornadas terminadas: titularidad y minutos
 .venv\Scripts\python -m transform.silver.construir     # bronze -> silver (se recalcula entero)
 ```
 

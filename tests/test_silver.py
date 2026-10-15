@@ -121,6 +121,8 @@ def test_mi_liga_plantilla_saldo_y_mercado():
     _guardar("plantilla", {
         "id": 11, "balance": -500, "points": 30,
         "lineup": {"type": "3-4-3", "playersID": [7, None]},
+        "market": [{"type": "sale", "playerID": 8, "price": 2100, "date": 1791500000,
+                    "until": 1792040400, "player": None}],
         "players": [{"id": 7, "owner": {"date": 1791500000, "price": 1000}},
                     {"id": 8, "owner": {"date": 1791500000, "price": 2000}}],
     }, D14)
@@ -139,6 +141,9 @@ def test_mi_liga_plantilla_saldo_y_mercado():
     assert [(f["jugador_id"], f["vendedor_id"], f["vendedor_es_biwenger"]) for f in
             r["fact_mercado_dia"]] == [(20, None, True), (21, 12, False)]
     assert r["fact_mercado_dia"][0]["cierre_utc"] == "2026-10-15T05:00:00Z"
+    assert r["mis_ventas"] == [{"fecha": "2026-10-14", "jugador_id": 8, "precio_pedido": 2100,
+                                "publicado_utc": "2026-10-08T22:53:20Z",
+                                "cierre_utc": "2026-10-15T05:00:00Z"}]
 
 
 def test_todas_las_tablas_respetan_su_esquema():
