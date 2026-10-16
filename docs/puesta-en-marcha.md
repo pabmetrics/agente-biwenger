@@ -72,7 +72,7 @@ Los valores son los mismos que tienes en `.env`.
 
 Con esto, Claude Code crea el job diario (ingesta → silver) con la CLI y lo prueba.
 
-## 4. Decisiones pendientes del diseño · cuando quieras · las necesita la Fase 3
+## 4. Decisiones pendientes del diseño · cuando quieras · las necesita la Fase 3 · ✅ respondidas el 16/10/2026 (en `docs/diseno-agente-biwenger.md`, «Reglas de propuesta»)
 
 Respóndelas en el chat y quedarán en `docs/diseno-agente-biwenger.md`:
 

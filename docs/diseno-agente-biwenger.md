@@ -17,7 +17,7 @@ El agente propone cada día fichajes y ventas orientados a revalorización, y la
 | Fuente de datos | API interna de Biwenger (JSON con token) | Automatizable; no oficial, puede cambiar |
 | Puntuación de la liga | Media (Picas AS + SofaScore) | El modelo predice una nota con componente subjetiva |
 | Objetivo en fichajes | Revalorización | El dato clave es el valor de mercado diario |
-| Reglas de saldo | Negativo permitido si se acompaña de ventas | El agente propone compras y ventas como un paquete |
+| Reglas de saldo | Negativo permitido entre jornadas, sin tope propio; ≥ 0 al empezar cada jornada | El agente propone compras y ventas como un paquete |
 | Canal | Telegram | Permite confirmar con botones |
 | Frecuencia | Diario (mercado) + víspera de jornada (alineación) | Dos ejecuciones distintas |
 | Contexto extra | Búsqueda web | Solo para jugadores dudosos |
@@ -97,10 +97,12 @@ El modelo ML pone los números; Claude decide con ellos, el saldo y el contexto,
 3. Elegir el once con más puntos esperados que cumpla una formación válida: las 7 gratuitas, o también las 7 de pago si hay créditos (lista en `docs/api-biwenger.md`).
 4. Enviar la alineación para confirmar, marcando las dudas.
 
-### Pendiente de definir
+### Reglas de propuesta (decididas el 16/10/2026)
 
-- Peso de la revalorización frente a los puntos en la alineación cuando un jugador se vende pronto.
-- Tope de compras por día y límite de saldo negativo en euros.
+- **Compras por día:** sin tope por número. Lo limitan el saldo y la puja máxima de Biwenger (`mercado().status.maximumBid`).
+- **Saldo negativo entre jornadas:** sin tope propio, más allá de la puja máxima de Biwenger. Sí es obligatorio que **el saldo sea ≥ 0 al empezar cada jornada**, porque si no, no se puntúa. Todo paquete que deje el saldo en negativo tiene que incluir ventas que lo cubran antes de la siguiente jornada, calculadas con el −5 % de la oferta de Biwenger.
+- **Revalorización frente a puntos:** mandan los puntos. Un jugador que se va a vender se alinea si está en el once con más puntos esperados, y la venta se propone después de que juegue.
+- **Precio de venta:** el valor de mercado del día.
 
 ## Flujo de confirmación por Telegram
 
