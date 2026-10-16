@@ -1,4 +1,7 @@
-"""Job diario en Databricks: ingesta a bronze y reconstrucción de silver y gold en Delta.
+"""Job diario en Databricks: ingesta, silver y gold en Delta, y la propuesta del agente.
+
+Opciones para probar: --sin-ingesta (no llama a Biwenger) y --sin-agente (no
+llama a Claude ni manda la propuesta).
 
 Corre como tarea Python serverless desde el Git folder del repo. Los secretos
 salen del scope 'biwenger' y bronze vive en el Volume biwenger.bronze.raw, así
@@ -38,6 +41,7 @@ SECRETOS = {
     "BIWENGER_USER_ID": "biwenger-user-id",
     "TELEGRAM_BOT_TOKEN": "telegram-bot-token",
     "TELEGRAM_CHAT_ID": "telegram-chat-id",
+    "ANTHROPIC_API_KEY": "anthropic-api-key",
 }
 
 
@@ -49,11 +53,11 @@ def _preparar_entorno() -> None:
     os.environ["BRONZE_PATH"] = f"/Volumes/{CATALOGO}/bronze/raw"
 
 
-def _escribir_capas() -> None:
-    """Reconstruye silver y gold desde bronze y los reescribe enteros en Delta."""
+def _escribir_capas() -> tuple[dict, dict]:
+    """Reconstruye silver y gold desde bronze, los reescribe enteros en Delta y los devuelve."""
     from databricks.sdk.runtime import spark
 
-    from transform.gold import construir as gold
+    from transform.gold import construir as construir_gold
     from transform.silver import delta
     from transform.silver.construir import construir as construir_silver
 
@@ -66,11 +70,24 @@ def _escribir_capas() -> None:
     silver = construir_silver(Path(os.environ["BRONZE_PATH"]))
     for tabla, filas in silver.items():
         escribir("silver", tabla, filas)
-    for tabla, filas in gold.construir(silver).items():
+    gold = construir_gold.construir(silver)
+    for tabla, filas in gold.items():
         escribir("gold", tabla, filas)
     # log_acciones solo crece (lo escriben las Fases 4 y 5): nunca se sobrescribe.
     spark.sql(f"CREATE TABLE IF NOT EXISTS {CATALOGO}.gold.log_acciones "
               f"({delta.esquema_ddl('log_acciones')}) USING DELTA")
+    return silver, gold
+
+
+def _registrar_propuesta(fila: dict) -> None:
+    """Añade la propuesta a log_acciones (append: el registro nunca se reescribe)."""
+    from databricks.sdk.runtime import spark
+
+    from transform.silver import delta
+
+    df = spark.createDataFrame(delta.filas_tipadas("log_acciones", [fila]), delta.esquema_ddl("log_acciones"))
+    df.write.format("delta").mode("append").saveAsTable(f"{CATALOGO}.gold.log_acciones")
+    print(f"{CATALOGO}.gold.log_acciones: +1 propuesta ({fila['propuesta_id']})")
 
 
 def main() -> int:
@@ -87,10 +104,26 @@ def main() -> int:
             avisos.enviar("❌ La ingesta de Biwenger ha fallado en Databricks:\n" + traceback.format_exc()[-1500:])
             codigo = 1
     try:
-        _escribir_capas()
+        silver, gold = _escribir_capas()
     except Exception:
         avisos.enviar("❌ La reconstrucción de silver/gold ha fallado en Databricks:\n" + traceback.format_exc()[-1500:])
         raise
+
+    # Fase 4: el agente propone el paquete del día. Solo con datos frescos: si la
+    # ingesta ha fallado, propondría sobre la foto de ayer.
+    if "--sin-agente" in sys.argv:
+        print("[aviso] --sin-agente: no se lanza el agente")
+    elif codigo:
+        print("[aviso] La ingesta tuvo fallos: no se lanza el agente para no proponer con datos viejos")
+    else:
+        from agent.agente import ejecutar
+        from agent.datos import Datos
+
+        try:
+            ejecutar(Datos(silver, gold), _registrar_propuesta, avisos.enviar)
+        except Exception:
+            avisos.enviar("❌ El agente ha fallado en Databricks:\n" + traceback.format_exc()[-1500:])
+            codigo = 1
     return codigo
 
 

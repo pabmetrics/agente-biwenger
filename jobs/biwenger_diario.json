@@ -1,6 +1,6 @@
 {
   "name": "biwenger-diario",
-  "description": "Ingesta diaria de Biwenger a bronze y reconstrucción de silver en Delta (ver jobs/diario.py).",
+  "description": "Ingesta diaria de Biwenger, silver y gold en Delta y propuesta del agente por Telegram (ver jobs/diario.py).",
   "schedule": {
     "quartz_cron_expression": "0 30 7 * * ?",
     "timezone_id": "Europe/Madrid",
@@ -29,7 +29,7 @@
       "environment_key": "default",
       "spec": {
         "client": "2",
-        "dependencies": ["httpx>=0.27", "python-dotenv>=1.0"]
+        "dependencies": ["httpx>=0.27", "python-dotenv>=1.0", "anthropic>=1.15"]
       }
     }
   ]
