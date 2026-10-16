@@ -1,6 +1,6 @@
-"""Tipos de las tablas silver para escribirlas en Delta.
+"""Tipos de las tablas silver y gold para escribirlas en Delta.
 
-Las filas de tablas.py usan tipos de Python simples (fechas como texto ISO)
+Las filas de transform/ usan tipos de Python simples (fechas como texto ISO)
 para que sirvan también en CSV. Aquí se convierten a los tipos de Spark: el
 esquema DDL de cada tabla y las filas como tuplas listas para
 spark.createDataFrame(filas, esquema). Sin dependencias de Spark, así que se
@@ -11,13 +11,23 @@ from __future__ import annotations
 
 from datetime import date, datetime
 
-from transform.silver.tablas import ESQUEMAS
+from transform.gold.tablas import ESQUEMAS as ESQUEMAS_GOLD
+from transform.silver.tablas import ESQUEMAS as ESQUEMAS_SILVER
 
-BOOLEANOS = {"local", "jugo", "titular", "alineado", "vendedor_es_biwenger", "de_biwenger"}
-FECHAS = {"fecha", "estado_desde", "fecha_compra"}
+ESQUEMAS = {**ESQUEMAS_SILVER, **ESQUEMAS_GOLD}
+
+BOOLEANOS = {
+    "local", "jugo", "titular", "alineado", "vendedor_es_biwenger", "de_biwenger", "disponible",
+    "en_once_probable",
+}
+FECHAS = {"fecha", "estado_desde", "fecha_compra", "fecha_calculo"}
+DECIMALES = {
+    "media_puntos_temp", "forma5", "p_juega5", "p_juega", "minutos_ult3", "factor_rival",
+    "puntos_esperados",
+}
 TEXTOS = {
     "nombre", "slug", "equipo", "posicion_nombre", "estado", "estado_info", "jornada", "local",
-    "visitante", "origen", "tipo",
+    "visitante", "origen", "tipo", "propuesta_id", "paquete", "explicacion", "resultado",
 }
 
 
@@ -28,6 +38,8 @@ def tipo(columna: str, tabla: str) -> str:
         return "DATE"
     if columna.endswith("_utc"):
         return "TIMESTAMP"
+    if columna.endswith("_pct") or columna in DECIMALES:
+        return "DOUBLE"
     if columna in TEXTOS:
         return "STRING"
     return "BIGINT"  # ids, importes en euros, puntos, minutos, posiciones
@@ -44,6 +56,8 @@ def _convertir(valor, t: str):
         return date.fromisoformat(valor)
     if t == "TIMESTAMP":
         return datetime.fromisoformat(valor.replace("Z", "+00:00"))
+    if t == "DOUBLE":
+        return float(valor)
     return valor
 
 

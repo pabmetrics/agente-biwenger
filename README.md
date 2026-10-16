@@ -17,6 +17,7 @@ copy .env.example .env      # y rellena el token
 .venv\Scripts\python -m ingest.backfill_jugadores      # ~1 año de precios (por tandas de 150)
 .venv\Scripts\python -m ingest.backfill_jornadas       # jornadas terminadas: titularidad y minutos
 .venv\Scripts\python -m transform.silver.construir     # bronze -> silver (se recalcula entero)
+.venv\Scripts\python -m transform.gold.construir       # bronze -> silver -> gold (features y scores)
 ```
 
 Bronze se escribe en `data/bronze/` (ignorado por git) o en `BRONZE_PATH`; silver, en `data/silver/` (un CSV por tabla en local) o en `SILVER_PATH`. Endpoints y campos: [docs/api-biwenger.md](docs/api-biwenger.md).
@@ -25,7 +26,7 @@ Bronze se escribe en `data/bronze/` (ignorado por git) o en `BRONZE_PATH`; silve
 
 - [x] Fase 1: ingesta — job `biwenger-diario` en Databricks cada día a las 7:30 (Madrid), bronze en `/Volumes/biwenger/bronze/raw`, avisos por Telegram
 - [x] Fase 2: silver — 10 tablas en Delta (`biwenger.silver.*`), reconstruidas por el mismo job
-- [ ] Fase 3: gold con reglas
+- [x] Fase 3: gold con reglas — `features_jugador`, `score_revalorizacion` y `score_puntos_esperados` en `biwenger.gold.*`, con backtest en `transform/gold/reglas.py`; `log_acciones` creada vacía
 - [ ] Fase 4: agente de solo lectura
 - [ ] Fase 5: confirmación y acciones
 - [ ] Fase 6: modelo ML

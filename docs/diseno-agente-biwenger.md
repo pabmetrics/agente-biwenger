@@ -45,7 +45,7 @@ Una ingesta diaria vuelca el JSON crudo a bronze; silver lo normaliza en tablas 
 | --- | --- | --- | --- |
 | Bronze | `raw_<endpoint>` | Llamada a la API | JSON crudo + fecha de carga |
 | Silver | `dim_jugador` | Jugador | Equipo, posición, estado (lesionado, dudoso, sancionado) |
-| Silver | `fact_valor_diario` | Jugador × día | Valor de mercado y variación diaria |
+| Silver | `fact_valor_diario` | Jugador × día | Valor de mercado y variación diaria; estado del jugador en los días con foto |
 | Silver | `fact_puntos_jornada` | Jugador × partido | Puntos Media, jugó sí/no, titularidad y minutos aproximados. Por partido y no por jornada porque hay jornadas aplazadas |
 | Silver | `fact_once_probable` | Día × partido × jugador | Onces probables de los partidos sin jugar, tal como estaban cada día |
 | Silver | `fact_mercado_dia` | Jugador en venta × día | Precio de salida, vendedor (liga o mánager) |
@@ -53,10 +53,12 @@ Una ingesta diaria vuelca el JSON crudo a bronze; silver lo normaliza en tablas 
 | Silver | `mis_ventas` | Jugador propio a la venta × día | Precio pedido (un mánager que lo pague se lo lleva sin confirmación), publicación y cierre |
 | Silver | `mi_saldo` | Día | Saldo, puja máxima, valor de equipo y posición en la liga |
 | Silver | `fact_ofertas` | Oferta × jugador × día | Importe, de quién (Biwenger o mánager), estado y caducidad |
-| Silver | `dim_calendario` | Partido | Jornada, rival, local/visitante, fecha |
-| Gold | `features_jugador` | Jugador × día | Tendencia de valor 3/7 días, forma, minutos, dificultad del rival |
-| Gold | `score_revalorizacion` | Jugador × día | Subida esperada a 1 y 3 días (%) |
-| Gold | `score_puntos_esperados` | Jugador × jornada | Puntos Media esperados |
+| Silver | `dim_calendario` | Partido | Jornada, rival, local/visitante, fecha y dificultad para cada equipo (solo en partidos sin jugar) |
+| Gold | `features_jugador` | Jugador × día | Variación de valor (1 día, media 3 y 7 días, 30 días), racha de subidas, estado, media de puntos, forma de los últimos 5, probabilidad de jugar y minutos. Calculadas "a fecha": solo con partidos anteriores a ese día |
+| Gold | `score_revalorizacion` | Jugador × día | Subida esperada a 1 y 3 días (%) y en euros, y si está disponible |
+| Gold | `score_puntos_esperados` | Jugador × día de foto × siguiente partido | Puntos Media esperados, con probabilidad de jugar, once probable y factor del rival |
+
+Las reglas y su backtest están en `transform/gold/reglas.py`. Resumen: el valor tiene mucha inercia (variación de hoy y media de 3 días; signo de mañana acertado en un 96,5 % de los casos fuera de muestra) y los puntos se predicen con (media + forma) / 2 × probabilidad de jugar. El once probable y la dificultad del rival aún están sin validar.
 | Gold | `log_acciones` | Propuesta | Qué propuso el agente, si lo confirmé y el resultado |
 
 `log_acciones` permite medir después si las recomendaciones acertaron.

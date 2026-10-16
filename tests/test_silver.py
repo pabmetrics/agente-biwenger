@@ -64,10 +64,13 @@ def test_valor_diario_une_historico_y_foto():
     _guardar("competicion", _competicion(100, 10), D14)
     filas = tablas.fact_valor_diario(leer("competicion"), leer("jugador"))
     assert filas == [
-        {"jugador_id": 7, "fecha": "2026-10-12", "valor": 80, "variacion": None, "origen": "historico"},
-        {"jugador_id": 7, "fecha": "2026-10-13", "valor": 90, "variacion": 10, "origen": "historico"},
-        # La foto manda sobre el histórico y trae la variación oficial.
-        {"jugador_id": 7, "fecha": "2026-10-14", "valor": 100, "variacion": 10, "origen": "foto"},
+        {"jugador_id": 7, "fecha": "2026-10-12", "valor": 80, "variacion": None, "origen": "historico",
+         "estado": None},
+        {"jugador_id": 7, "fecha": "2026-10-13", "valor": 90, "variacion": 10, "origen": "historico",
+         "estado": None},
+        # La foto manda sobre el histórico y trae la variación oficial y el estado.
+        {"jugador_id": 7, "fecha": "2026-10-14", "valor": 100, "variacion": 10, "origen": "foto",
+         "estado": "ok"},
     ]
 
 

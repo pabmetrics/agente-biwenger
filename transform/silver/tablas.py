@@ -19,7 +19,7 @@ ESQUEMAS: dict[str, list[str]] = {
         "jugador_id", "nombre", "slug", "equipo_id", "equipo", "posicion", "posicion_nombre",
         "estado", "estado_info", "estado_desde", "fecha",
     ],
-    "fact_valor_diario": ["jugador_id", "fecha", "valor", "variacion", "origen"],
+    "fact_valor_diario": ["jugador_id", "fecha", "valor", "variacion", "origen", "estado"],
     "fact_puntos_jornada": [
         "jugador_id", "partido_id", "jornada_id", "jornada", "fecha", "local", "rival_id",
         "jugo", "puntos", "titular", "minuto_entrada", "minuto_salida", "minutos",
@@ -27,6 +27,7 @@ ESQUEMAS: dict[str, list[str]] = {
     "dim_calendario": [
         "partido_id", "jornada_id", "jornada", "fecha", "inicio_utc", "local_id", "local",
         "visitante_id", "visitante", "goles_local", "goles_visitante", "estado",
+        "dificultad_local", "dificultad_visitante",
     ],
     "fact_once_probable": ["fecha", "jornada_id", "partido_id", "equipo_id", "jugador_id"],
     "fact_mercado_dia": [
@@ -108,11 +109,14 @@ def fact_valor_diario(competicion: list[Registro], jugadores: list[Registro]) ->
     for r in jugadores:  # en orden: el detalle más reciente sobrescribe
         jid = r.data["id"]
         for aammdd, precio in r.data.get("prices", []):
-            valores[(jid, _fecha_aammdd(aammdd))] = {"valor": precio, "variacion": None, "origen": "historico"}
+            valores[(jid, _fecha_aammdd(aammdd))] = {
+                "valor": precio, "variacion": None, "origen": "historico", "estado": None,
+            }
     for r in ultimo_por_dia(competicion):
         for j in r.data["players"].values():
             valores[(j["id"], r.fecha)] = {
                 "valor": j["price"], "variacion": j.get("priceIncrement"), "origen": "foto",
+                "estado": j.get("status"),  # el estado solo se conoce en los días con foto
             }
 
     filas = []
@@ -223,6 +227,10 @@ def dim_calendario(
             "goles_local": h.get("score"),
             "goles_visitante": a.get("score"),
             "estado": g.get("status"),
+            # Dificultad del partido para cada equipo (0-100, más alto = más difícil).
+            # Solo viene en los partidos sin jugar; se conserva la última conocida.
+            "dificultad_local": (h.get("difficulty") or {}).get("rating"),
+            "dificultad_visitante": (a.get("difficulty") or {}).get("rating"),
         }
 
     for r in jugadores:
