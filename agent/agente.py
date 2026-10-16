@@ -29,7 +29,11 @@ from agent.datos import FORMACIONES_GRATIS, FORMACIONES_PAGO, Datos
 from agent.validacion import validar
 from ingest import avisos
 
-MODELO = "claude-opus-5"
+# Configurables para ajustar coste y calidad sin tocar código. Prueba del
+# 16/10/2026 con los mismos datos: Opus 5 (high) ~0,39 $ por ejecución y Sonnet 5
+# (medium) ~0,18 $, con las mismas decisiones; Opus razonaba algo mejor a varios días.
+MODELO = os.getenv("AGENTE_MODELO", "claude-sonnet-5")
+ESFUERZO = os.getenv("AGENTE_ESFUERZO", "medium")  # low | medium | high | xhigh | max
 MAX_VUELTAS = 20
 
 SISTEMA = f"""Eres el asistente de mi equipo de Biwenger (LaLiga, puntuación "Media AS + SofaScore").
@@ -138,7 +142,11 @@ def ejecutar(
     gasto = {"llamadas": 0, "entrada": 0, "cache_leida": 0, "cache_escrita": 0, "salida": 0}
 
     def informar_gasto() -> None:
-        print("Tokens: " + ", ".join(f"{k} {v}" for k, v in gasto.items()))
+        print(f"Modelo {MODELO}, esfuerzo {ESFUERZO}. Tokens: " + ", ".join(f"{k} {v}" for k, v in gasto.items()))
+
+    # La reserva automática ante rechazos es para Opus y Fable; en Sonnet no se pide.
+    reserva = (dict(betas=["server-side-fallback-2026-07-01"], fallbacks="default")
+               if MODELO.startswith(("claude-opus", "claude-fable")) else {})
 
     for _ in range(MAX_VUELTAS):
         r = cliente.beta.messages.create(
@@ -148,10 +156,9 @@ def ejecutar(
             tools=[*herramientas.DEFINICIONES, herramientas.WEB_SEARCH],
             messages=mensajes,
             thinking={"type": "adaptive"},
-            output_config={"effort": "high"},
+            output_config={"effort": ESFUERZO},
             cache_control={"type": "ephemeral"},
-            betas=["server-side-fallback-2026-07-01"],
-            fallbacks="default",
+            **reserva,
         )
         u = getattr(r, "usage", None)
         if u is not None:

@@ -28,6 +28,6 @@ Bronze se escribe en `data/bronze/` (ignorado por git) o en `BRONZE_PATH`; silve
 - [x] Fase 1: ingesta — job `biwenger-diario` en Databricks cada día a las 7:30 (Madrid), bronze en `/Volumes/biwenger/bronze/raw`, avisos por Telegram
 - [x] Fase 2: silver — 10 tablas en Delta (`biwenger.silver.*`), reconstruidas por el mismo job
 - [x] Fase 3: gold con reglas — `features_jugador`, `score_revalorizacion` y `score_puntos_esperados` en `biwenger.gold.*`, con backtest en `transform/gold/reglas.py`; `log_acciones` creada vacía
-- [x] Fase 4: agente de solo lectura — Claude Opus 5 propone cada día a las 7:30 (compras, ventas, ofertas y, la víspera, la alineación) por Telegram; reglas duras validadas en código (`agent/validacion.py`); cada propuesta en `biwenger.gold.log_acciones`. ~0,40 $ por ejecución
+- [x] Fase 4: agente de solo lectura — Claude (Sonnet 5, esfuerzo medio; configurable con `AGENTE_MODELO` / `AGENTE_ESFUERZO`) propone cada día a las 7:30 (compras, ventas, ofertas y, la víspera, la alineación) por Telegram; reglas duras validadas en código (`agent/validacion.py`); cada propuesta en `biwenger.gold.log_acciones`. ~0,18 $ por ejecución (~0,39 $ con Opus 5)
 - [ ] Fase 5: confirmación y acciones
 - [ ] Fase 6: modelo ML
