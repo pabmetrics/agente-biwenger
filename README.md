@@ -24,7 +24,7 @@ Bronze se escribe en `data/bronze/` (ignorado por git) o en `BRONZE_PATH`; silve
 ## Estado
 
 - [ ] Fase 1: ingesta — cliente, bronze y endpoints públicos y privados verificados; falta el job en Databricks
-- [ ] Fase 2: silver — 8 tablas construidas y probadas en local; faltan `fact_ofertas` y escribirlas en Delta en Databricks
+- [ ] Fase 2: silver — 10 tablas construidas y probadas en local; falta escribirlas en Delta en Databricks
 - [ ] Fase 3: gold con reglas
 - [ ] Fase 4: agente de solo lectura
 - [ ] Fase 5: confirmación y acciones

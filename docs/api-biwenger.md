@@ -59,7 +59,11 @@ En una jornada terminada, `games[].home/away.reports[]` trae solo a los que juga
 | --- | --- | --- |
 | 4 | Sale (sustituido) | Mismo número que los tipo 5 en la jornada 8 (86) |
 | **5** | **Entra (suplente)** | En cada equipo, los jugadores sin tipo 5 son exactamente 11 |
-| 1, 6, … | Sin confirmar (6 parece amarilla; 1, gol) | Pendiente; los minutos no los usan |
+| **1** | **Gol** | Contando 1 + 2 por equipo sale el marcador en 147 de 156 casos (16/10/2026) |
+| 2 | Gol, probablemente de penalti | Sin él, el marcador cuadra solo en 128 de 156 |
+| 6, … | Sin confirmar (6 parece amarilla) | Pendiente; los minutos no los usan |
+
+Los casos que no cuadran tienen siempre menos goles que el marcador: serán goles en propia puerta, cuyo código no está identificado (el 16 no lo es).
 
 Con 4 y 5, silver calcula `titular` y unos `minutos` aproximados: no cuentan el descuento ni las expulsiones. En `preview`, `reports[]` es el once probable: `{player, points: null}`, 11 por equipo.
 | `birthday`, `country`, `team` | Datos del jugador |
@@ -118,7 +122,7 @@ Siempre 1 portero. La liga tiene `lineupMultiPos: false`, así que cada jugador 
   - con una **oferta más baja**, que puedo aceptar o no.
 
   Así que el precio que pongo al vender importa: es lo mínimo que cobro si me lo compra un mánager. La oferta de Biwenger de las 7:00 va aparte, y es de ~valor ±5 % sea cual sea el precio pedido.
-- Esas ofertas deberían aparecer en `mercado().offers`. La primera que llegue servirá para ver su forma y construir `fact_ofertas`.
+- **Confirmado el 16/10/2026:** las ofertas de Biwenger aparecen en `mercado().offers` con `from: null`, creadas a las 7:03 (hora de Madrid) y válidas **48 h**. Las dos primeras fueron de un +0,4 % y un +0,9 % sobre el precio pedido. Al recibir la oferta, el jugador deja de figurar en `plantilla().market`, aunque la oferta siga pendiente.
 
 ### `plantilla()` → `data`
 
@@ -135,7 +139,7 @@ Siempre 1 portero. La liga tiene `lineupMultiPos: false`, así que cada jugador 
 | Campo | Contenido |
 | --- | --- |
 | **`sales[]`** | En venta hoy: `player`, `price`, `user` (vendedor; vacío si es Biwenger), `date`, `until` (cierre) |
-| **`offers`** | Lista de ofertas recibidas. Falta ver la forma de un elemento: hay que mirarla en bronze el primer día que haya una oferta |
+| **`offers[]`** | Ofertas recibidas (vistas el 16/10/2026): `{id, amount, created, until, status, type, from, to, requestedPlayers}`. `type: "purchase"`, `status: "waiting"` mientras no la acepto, `from: null` = Biwenger (con un mánager, debería ser `{id, name, icon}`, como `to`), `requestedPlayers` = ids de los jugadores que pide |
 | **`status`** | `{balance, maximumBid}`: saldo y puja máxima permitida |
 
 ### `liga()` → `data`

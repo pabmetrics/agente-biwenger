@@ -33,6 +33,10 @@ ESQUEMAS: dict[str, list[str]] = {
         "fecha", "jugador_id", "precio", "vendedor_id", "vendedor_es_biwenger",
         "publicado_utc", "cierre_utc",
     ],
+    "fact_ofertas": [
+        "fecha", "oferta_id", "jugador_id", "importe", "n_jugadores", "de_id", "de_biwenger",
+        "estado", "tipo", "creada_utc", "caduca_utc",
+    ],
     "mi_plantilla": ["fecha", "jugador_id", "fecha_compra", "precio_compra", "alineado"],
     "mis_ventas": ["fecha", "jugador_id", "precio_pedido", "publicado_utc", "cierre_utc"],
     "mi_saldo": ["fecha", "saldo", "puja_maxima", "valor_equipo", "puntos", "posicion_liga"],
@@ -288,9 +292,33 @@ def fact_mercado_dia(mercado: list[Registro]) -> list[dict]:
     return filas
 
 
-def ofertas_sin_mapear(mercado: list[Registro]) -> int:
-    """fact_ofertas espera a ver una oferta real: hasta entonces solo se cuentan."""
-    return sum(len(r.data.get("offers", [])) for r in ultimo_por_dia(mercado))
+def fact_ofertas(mercado: list[Registro]) -> list[dict]:
+    """Ofertas recibidas por mis jugadores, tal como estaban cada día.
+
+    Sin 'from' = la oferta automática de Biwenger (cada día a las 7:00, ~valor
+    ±5 %). Si una oferta pide varios jugadores, va una fila por jugador con el
+    importe total del paquete y n_jugadores.
+    """
+    filas = []
+    for r in ultimo_por_dia(mercado):
+        for o in r.data.get("offers", []):
+            de = o.get("from")
+            jugadores = o.get("requestedPlayers") or []
+            for jid in jugadores:
+                filas.append({
+                    "fecha": r.fecha,
+                    "oferta_id": o["id"],
+                    "jugador_id": jid,
+                    "importe": o.get("amount"),
+                    "n_jugadores": len(jugadores),
+                    "de_id": de["id"] if de else None,
+                    "de_biwenger": de is None,
+                    "estado": o.get("status"),
+                    "tipo": o.get("type"),
+                    "creada_utc": _ts(o.get("created")),
+                    "caduca_utc": _ts(o.get("until")),
+                })
+    return filas
 
 
 def mi_plantilla(plantilla: list[Registro]) -> list[dict]:

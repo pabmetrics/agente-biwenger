@@ -126,7 +126,13 @@ def test_mi_liga_plantilla_saldo_y_mercado():
         "players": [{"id": 7, "owner": {"date": 1791500000, "price": 1000}},
                     {"id": 8, "owner": {"date": 1791500000, "price": 2000}}],
     }, D14)
-    _guardar("mercado", {"status": {"balance": -500, "maximumBid": 9000}, "offers": [], "sales": [
+    ofertas = [
+        {"id": 1, "amount": 2050, "created": 1791500000, "until": 1792040400, "status": "waiting",
+         "type": "purchase", "from": None, "to": {"id": 11}, "requestedPlayers": [8]},
+        {"id": 2, "amount": 2500, "created": 1791500000, "until": 1792040400, "status": "waiting",
+         "type": "purchase", "from": {"id": 12}, "to": {"id": 11}, "requestedPlayers": [7, 8]},
+    ]
+    _guardar("mercado", {"status": {"balance": -500, "maximumBid": 9000}, "offers": ofertas, "sales": [
         {"player": {"id": 20}, "price": 300, "user": None, "date": 1791500000, "until": 1792040400},
         {"player": {"id": 21}, "price": 400, "user": {"id": 12}, "date": 1791500000, "until": 1792040400},
     ]}, D14)
@@ -141,6 +147,9 @@ def test_mi_liga_plantilla_saldo_y_mercado():
     assert [(f["jugador_id"], f["vendedor_id"], f["vendedor_es_biwenger"]) for f in
             r["fact_mercado_dia"]] == [(20, None, True), (21, 12, False)]
     assert r["fact_mercado_dia"][0]["cierre_utc"] == "2026-10-15T05:00:00Z"
+    assert [(f["oferta_id"], f["jugador_id"], f["importe"], f["n_jugadores"], f["de_id"],
+             f["de_biwenger"]) for f in r["fact_ofertas"]] == [
+        (1, 8, 2050, 1, None, True), (2, 7, 2500, 2, 12, False), (2, 8, 2500, 2, 12, False)]
     assert r["mis_ventas"] == [{"fecha": "2026-10-14", "jugador_id": 8, "precio_pedido": 2100,
                                 "publicado_utc": "2026-10-08T22:53:20Z",
                                 "cierre_utc": "2026-10-15T05:00:00Z"}]

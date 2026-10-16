@@ -35,6 +35,7 @@ def construir(base: Path | None = None) -> dict[str, list[dict]]:
         "dim_calendario": tablas.dim_calendario(comp, jornadas, jug),
         "fact_once_probable": tablas.fact_once_probable(jornadas),
         "fact_mercado_dia": tablas.fact_mercado_dia(mercado),
+        "fact_ofertas": tablas.fact_ofertas(mercado),
         "mi_plantilla": tablas.mi_plantilla(plantilla),
         "mis_ventas": tablas.mis_ventas(plantilla),
         "mi_saldo": tablas.mi_saldo(plantilla, mercado, liga),
@@ -57,9 +58,6 @@ def main() -> int:
     escribir_csv(resultado, destino)
     for nombre, filas in resultado.items():
         print(f"{nombre:<22} {len(filas):>7} filas")
-    pendientes = tablas.ofertas_sin_mapear(leer("mercado"))
-    if pendientes:
-        print(f"[aviso] {pendientes} ofertas en bronze sin tabla: toca definir fact_ofertas")
     print(f"-> {destino}")
     return 0
 

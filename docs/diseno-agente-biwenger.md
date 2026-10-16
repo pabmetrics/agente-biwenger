@@ -52,7 +52,7 @@ Una ingesta diaria vuelca el JSON crudo a bronze; silver lo normaliza en tablas 
 | Silver | `mi_plantilla` | Jugador propio × día | Precio y fecha de compra, alineado sí/no. Sin cláusula: la liga no tiene |
 | Silver | `mis_ventas` | Jugador propio a la venta × día | Precio pedido (un mánager que lo pague se lo lleva sin confirmación), publicación y cierre |
 | Silver | `mi_saldo` | Día | Saldo, puja máxima, valor de equipo y posición en la liga |
-| Silver | `fact_ofertas` | Oferta | Jugador, importe, fecha límite. Pendiente hasta ver una oferta real en bronze |
+| Silver | `fact_ofertas` | Oferta × jugador × día | Importe, de quién (Biwenger o mánager), estado y caducidad |
 | Silver | `dim_calendario` | Partido | Jornada, rival, local/visitante, fecha |
 | Gold | `features_jugador` | Jugador × día | Tendencia de valor 3/7 días, forma, minutos, dificultad del rival |
 | Gold | `score_revalorizacion` | Jugador × día | Subida esperada a 1 y 3 días (%) |
