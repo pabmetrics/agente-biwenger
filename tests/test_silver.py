@@ -155,6 +155,36 @@ def test_mi_liga_plantilla_saldo_y_mercado():
                                 "cierre_utc": "2026-10-15T05:00:00Z"}]
 
 
+def test_tipos_delta():
+    from datetime import date, datetime, timezone
+
+    from transform.silver import delta
+
+    assert delta.esquema_ddl("mis_ventas") == (
+        "fecha DATE, jugador_id BIGINT, precio_pedido BIGINT, publicado_utc TIMESTAMP, "
+        "cierre_utc TIMESTAMP")
+    # 'local' es booleano en los puntos y el nombre del equipo en el calendario.
+    assert delta.tipo("local", "fact_puntos_jornada") == "BOOLEAN"
+    assert delta.tipo("local", "dim_calendario") == "STRING"
+    [fila] = delta.filas_tipadas("mis_ventas", [{
+        "fecha": "2026-10-14", "jugador_id": 8, "precio_pedido": 2100,
+        "publicado_utc": "2026-10-08T22:53:20Z", "cierre_utc": None}])
+    assert fila == (date(2026, 10, 14), 8, 2100,
+                    datetime(2026, 10, 8, 22, 53, 20, tzinfo=timezone.utc), None)
+
+
+def test_todas_las_columnas_de_texto_son_texto():
+    from transform.silver import delta
+
+    _guardar("competicion", _competicion(100, 0), D14)
+    for nombre, filas in construir().items():
+        tipos = dict(zip(tablas.ESQUEMAS[nombre], delta.esquema_ddl(nombre).split(", ")))
+        for f in filas:
+            for c, v in f.items():
+                if isinstance(v, str) and not tipos[c].endswith(("STRING", "DATE", "TIMESTAMP")):
+                    raise AssertionError(f"{nombre}.{c} es texto pero se declara {tipos[c]}")
+
+
 def test_todas_las_tablas_respetan_su_esquema():
     _guardar("competicion", _competicion(100, 0, estado="injured"), D14)
     for nombre, filas in construir().items():
