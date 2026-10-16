@@ -136,7 +136,7 @@ Cada fase entrega algo usable; el agente recomienda antes de tener el modelo ML 
 
 - [x] **Fase 1 — Ingesta:** explorar los endpoints de la API, notebook bronze y job diario en Databricks.
 - [x] **Fase 2 — Silver:** tablas normalizadas y snapshot diario de valor y mercado.
-- [ ] **Fase 3 — Gold con reglas:** features y scores por reglas simples (tendencia de valor, minutos, rival).
-- [ ] **Fase 4 — Agente solo lectura:** llamada a la API de Claude con las herramientas de lectura y mensaje por Telegram.
+- [x] **Fase 3 — Gold con reglas:** features y scores por reglas simples (tendencia de valor, minutos, rival).
+- [x] **Fase 4 — Agente solo lectura:** llamada a la API de Claude con las herramientas de lectura y mensaje por Telegram. `proponer_accion` valida el paquete con código (`agent/validacion.py`) antes de registrarlo; el agente se lanza dentro del job diario solo si la ingesta del día fue bien.
 - [ ] **Fase 5 — Confirmación y acciones:** bot de Telegram con botones y Azure Function que ejecuta las acciones.
 - [ ] **Fase 6 — Modelo ML:** sustituir las reglas por modelos entrenados con el histórico acumulado y medir aciertos con `log_acciones`.
