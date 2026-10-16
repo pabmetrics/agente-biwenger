@@ -4,7 +4,7 @@ Pasos que no puede hacer Claude Code porque necesitan tus cuentas. Van en orden 
 
 **Regla para todo:** los tokens y claves van en `.env` (local) o en el secret scope de Databricks. Nunca en el chat, en un commit ni en una captura.
 
-## 1. Bot de Telegram · 5 min · desbloquea los avisos de error
+## 1. Bot de Telegram · 5 min · desbloquea los avisos de error · ✅ hecho el 16/10/2026 (@pablo_biwenger_bot)
 
 1. En Telegram, abre **@BotFather** y envía `/newbot`.
 2. Elige un nombre (p. ej. "Agente Biwenger") y un usuario que acabe en `bot` (p. ej. `pablo_biwenger_bot`).
@@ -12,7 +12,7 @@ Pasos que no puede hacer Claude Code porque necesitan tus cuentas. Van en orden 
 4. Abre el chat con tu bot nuevo y envíale cualquier mensaje ("hola"). Sin esto, el bot no puede escribirte.
 5. Avisa a Claude Code: saca tu `TELEGRAM_CHAT_ID` con una llamada a `getUpdates` y lo deja en `.env`.
 
-## 2. Clave de la API de Claude · 5 min · desbloquea la Fase 4
+## 2. Clave de la API de Claude · 5 min · desbloquea la Fase 4 · ✅ hecho el 16/10/2026
 
 1. Entra en **console.anthropic.com** y añade un método de pago si no lo tienes.
 2. **Settings → Limits**: pon un límite de gasto mensual bajo (p. ej. 10 $). El agente hará pocas llamadas al día.
