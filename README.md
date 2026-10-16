@@ -23,8 +23,8 @@ Bronze se escribe en `data/bronze/` (ignorado por git) o en `BRONZE_PATH`; silve
 
 ## Estado
 
-- [ ] Fase 1: ingesta — cliente, bronze y endpoints públicos y privados verificados; falta el job en Databricks
-- [ ] Fase 2: silver — 10 tablas construidas y probadas en local; falta escribirlas en Delta en Databricks
+- [x] Fase 1: ingesta — job `biwenger-diario` en Databricks cada día a las 7:30 (Madrid), bronze en `/Volumes/biwenger/bronze/raw`, avisos por Telegram
+- [x] Fase 2: silver — 10 tablas en Delta (`biwenger.silver.*`), reconstruidas por el mismo job
 - [ ] Fase 3: gold con reglas
 - [ ] Fase 4: agente de solo lectura
 - [ ] Fase 5: confirmación y acciones

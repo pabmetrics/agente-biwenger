@@ -19,7 +19,9 @@ Pasos que no puede hacer Claude Code porque necesitan tus cuentas. Van en orden 
 3. **API Keys → Create Key**, con el nombre `agente-biwenger`.
 4. Cópiala (solo se muestra una vez) en `.env` como `ANTHROPIC_API_KEY=`.
 
-## 3. Databricks · 30–45 min · desbloquea el cierre de las Fases 1 y 2
+## 3. Databricks · 30–45 min · desbloquea el cierre de las Fases 1 y 2 · ✅ hecho el 16/10/2026
+
+Hecho: catálogo `biwenger` con su Volume, la CLI con sesión iniciada en el portátil, el scope `biwenger` con 6 secretos (incluida `anthropic-api-key`), push a GitHub y el Git folder en `/Workspace/Users/pabmetrics@gmail.com/agente-biwenger`. El job `biwenger-diario` (definido en `jobs/biwenger_diario.json`) corre cada día a las 7:30 de Madrid y lee el código de `main` en GitHub.
 
 ### 3.1 Workspace y catálogo
 

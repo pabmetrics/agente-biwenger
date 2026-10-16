@@ -130,8 +130,8 @@ El paquete de compras y ventas se confirma entero para no quedar en saldo negati
 
 Cada fase entrega algo usable; el agente recomienda antes de tener el modelo ML y antes de actuar.
 
-- [ ] **Fase 1 — Ingesta:** explorar los endpoints de la API, notebook bronze y job diario en Databricks.
-- [ ] **Fase 2 — Silver:** tablas normalizadas y snapshot diario de valor y mercado.
+- [x] **Fase 1 — Ingesta:** explorar los endpoints de la API, notebook bronze y job diario en Databricks.
+- [x] **Fase 2 — Silver:** tablas normalizadas y snapshot diario de valor y mercado.
 - [ ] **Fase 3 — Gold con reglas:** features y scores por reglas simples (tendencia de valor, minutos, rival).
 - [ ] **Fase 4 — Agente solo lectura:** llamada a la API de Claude con las herramientas de lectura y mensaje por Telegram.
 - [ ] **Fase 5 — Confirmación y acciones:** bot de Telegram con botones y Azure Function que ejecuta las acciones.
