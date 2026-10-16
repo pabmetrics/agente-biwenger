@@ -11,13 +11,25 @@ caído no debe dejar sin actualizar el resto.
 
 from __future__ import annotations
 
+import inspect
 import os
 import sys
 import traceback
 from pathlib import Path
 
-RAIZ = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(RAIZ))
+
+def _raiz_del_repo() -> Path:
+    # En serverless el script se ejecuta con exec() y sin __file__, pero se
+    # compila con su ruta real, que queda en co_filename.
+    origen = Path(inspect.currentframe().f_code.co_filename)
+    for base in (origen.resolve().parent, Path.cwd()):
+        for p in (base, *base.parents):
+            if (p / "ingest").is_dir() and (p / "transform").is_dir():
+                return p
+    raise RuntimeError(f"No encuentro la raíz del repo desde {origen} ni desde {Path.cwd()}")
+
+
+sys.path.insert(0, str(_raiz_del_repo()))
 
 CATALOGO = os.getenv("BIWENGER_CATALOGO", "biwenger")
 SECRETOS = {

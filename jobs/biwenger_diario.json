@@ -1,0 +1,36 @@
+{
+  "name": "biwenger-diario",
+  "description": "Ingesta diaria de Biwenger a bronze y reconstrucción de silver en Delta (ver jobs/diario.py).",
+  "schedule": {
+    "quartz_cron_expression": "0 30 7 * * ?",
+    "timezone_id": "Europe/Madrid",
+    "pause_status": "UNPAUSED"
+  },
+  "max_concurrent_runs": 1,
+  "git_source": {
+    "git_url": "https://github.com/pabmetrics/agente-biwenger",
+    "git_provider": "gitHub",
+    "git_branch": "main"
+  },
+  "tasks": [
+    {
+      "task_key": "ingesta_y_silver",
+      "spark_python_task": {
+        "python_file": "jobs/diario.py",
+        "source": "GIT"
+      },
+      "environment_key": "default",
+      "max_retries": 0,
+      "timeout_seconds": 1800
+    }
+  ],
+  "environments": [
+    {
+      "environment_key": "default",
+      "spec": {
+        "client": "2",
+        "dependencies": ["httpx>=0.27", "python-dotenv>=1.0"]
+      }
+    }
+  ]
+}
